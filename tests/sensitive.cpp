@@ -42,8 +42,7 @@ TEST(PhotoSensitiveSurface,Efficiency){
 			Phm->End();
 			stat<<(check->data().size());
 		}
-		if((eff==0)||(eff==1))
-			EXPECT_EQ(eff*1000,stat().val());
+		if((eff==0)||(eff==1)){EXPECT_EQ(eff*1000,stat().val());}
 		EXPECT_TRUE(stat().Contains(eff*1000));
 	}
 }

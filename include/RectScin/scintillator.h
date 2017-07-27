@@ -10,12 +10,12 @@
 #include "geometry.h"
 namespace RectangularScintillator{
 	const double speed_of_light=300;//mm/ns
-	typedef std::function<double(const double&)> Func;
-	typedef std::mt19937 RANDOM;
-	typedef MathTemplates::IFunction<double,RANDOM&> Distrib;
-	typedef MathTemplates::RandomValueTableDistr<double,RANDOM&> DistribTable;
-	typedef MathTemplates::RandomGauss<double,RANDOM&> DistribGauss;
-	typedef MathTemplates::RandomUniform<double,RANDOM&> DistribUniform;
+	typedef std::function<const double(const double&)> Func;
+	typedef MathTemplates::RANDOM RANDOM;
+	typedef MathTemplates::RandomValueGenerator<> Distrib;
+	typedef MathTemplates::RandomValueTableDistr<> DistribTable;
+	typedef MathTemplates::RandomGauss<> DistribGauss;
+	typedef MathTemplates::RandomUniform<> DistribUniform;
 	struct Photon{
 		Vec coord;
 		double time;
@@ -82,7 +82,7 @@ namespace RectangularScintillator{
 		static Options Defaults();
 		static Options Concurrency(const size_t c);
 		static Options Reflections(const unsigned long r);
-		void Configure(const Options&&conf);
+		void Configure(const Options&conf);
 		const Options&CurrentConfig()const;
 		
 		const MathTemplates::LinearInterpolation<double>&ReflectionProbabilityFunction()const;
@@ -122,8 +122,8 @@ namespace RectangularScintillator{
 	}
 
 	const std::shared_ptr<Distrib> TimeDistribution1(const double&sigma, const double& decay,
-	    const MathTemplates::SortedChain<double>&&time_chain=MathTemplates::ChainWithStep(0.0,0.01,20.0));
+	    const MathTemplates::SortedChain<double>&&time_chain=MathTemplates::ChainWithStep(0.0,0.1,20.0));
 	const std::shared_ptr<Distrib> TimeDistribution2(const double& rize, const double& sigma,const double&decay,
-	    const MathTemplates::SortedChain<double>&&time_chain=MathTemplates::ChainWithStep(0.0,0.01,20.0));
+	    const MathTemplates::SortedChain<double>&&time_chain=MathTemplates::ChainWithStep(0.0,0.1,20.0));
 };
 #endif

@@ -106,7 +106,7 @@ namespace RectangularScintillator{
 	Scintillator::Options Scintillator::Reflections(const long unsigned int r){return Options(1,r);}
 	
 	
-	void Scintillator::Configure(const Scintillator::Options&& conf){
+	void Scintillator::Configure(const Scintillator::Options&conf){
 		m_config=conf;
 	}
 	const Scintillator::Options& Scintillator::CurrentConfig()const{
