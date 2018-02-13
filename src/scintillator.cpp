@@ -16,11 +16,11 @@ namespace RectangularScintillator{
 		for(auto handler:m_handlers)
 			handler->Start();
 	}
-	void ScintillatorSurface::RegisterPhoton(Photon&photon,RANDOM&R){
+	void ScintillatorSurface::RegisterPhoton(Photon&photon){
 		if(IsInside(photon.coord)){
 			Lock lock(surface_mutex);
 			for(auto handler:m_handlers)
-				handler->AbsorbPhoton(photon,R);
+				handler->AbsorbPhoton(photon);
 		}
 	}
 	void ScintillatorSurface::End(){
@@ -120,7 +120,7 @@ namespace RectangularScintillator{
 		if(side==Right)return *(m_edges[dimension].second);
 		throw Exception<Scintillator>("Scintillator: surface index out of range");
 	}
-	void Scintillator::RegisterGamma(const Vec&&coord,const size_t N,RANDOM&R)const{
+	void Scintillator::RegisterGamma(const Vec&&coord,const size_t N)const{
 		for(const SurfPair&sp:m_edges){
 			sp.first->Start();
 			sp.second->Start();
@@ -129,12 +129,12 @@ namespace RectangularScintillator{
 			throw Exception<Scintillator>("Scintillator: wrong gamma interaction point vector size");
 		if(!IsInside(coord))
 			throw Exception<Scintillator>("Scintillator: gamma interaction point is outside");
-		auto process=[this,&coord,&R](size_t n){
+		auto process=[this,&coord](size_t n){
 			for(size_t i=0;i<n;i++){
-				Photon ph=GeneratePhoton(coord,R);
-				IntersectionSearchResults trace=TraceGeometry(ph,R);
+				Photon ph=GeneratePhoton(coord);
+				IntersectionSearchResults trace=TraceGeometry(ph);
 				if(trace.surface!=None){
-					Surface(trace.surfaceDimentionIndex,trace.surface).RegisterPhoton(ph,R);
+					Surface(trace.surfaceDimentionIndex,trace.surface).RegisterPhoton(ph);
 				}
 			}
 		};
@@ -154,29 +154,29 @@ namespace RectangularScintillator{
 			sp.second->End();
 		}
 	}
-	Photon Scintillator::GeneratePhoton(const Vec&coord,RANDOM&R)const{
+	Photon Scintillator::GeneratePhoton(const Vec&coord)const{
 		Photon res;
 		res.coord=coord;
 		if(NumberOfDimensions()==1){
-			uniform_int_distribution<int> get_bin(0,1);
-			if(get_bin(R)==0)
+			RandomUniform<> get_bin(0,1);
+			if(get_bin()<0.5)
 				res.dir.push_back(-1);
 			else
 				res.dir.push_back(1);
 		}
 		if(NumberOfDimensions()==2){
-			uniform_real_distribution<double> get_angle(0,2.0*3.1415926);
-			double phi=get_angle(R);
+			RandomUniform<> get_angle(0,2.0*3.1415926);
+			double phi=get_angle();
 			res.dir.push_back(sin(phi));
 			res.dir.push_back(cos(phi));
 		}
 		if(NumberOfDimensions()==3){
-			uniform_real_distribution<double> get_angle(0,2.0*3.1415926);
-			uniform_real_distribution<double> get_secondangle(-1,1);
+			RandomUniform<> get_angle(0,2.0*3.1415926);
+			RandomUniform<> get_secondangle(-1,1);
 			double cos_theta,phi;
 			{Lock lock(*trace_mutex);
-				phi=get_angle(R);
-				cos_theta=get_secondangle(R);
+				phi=get_angle();
+				cos_theta=get_secondangle();
 			}
 			double sin_theta=sqrt(1-cos_theta*cos_theta);
 			res.dir.push_back(cos_theta);
@@ -187,13 +187,13 @@ namespace RectangularScintillator{
 			throw Exception<Scintillator>("Scintillator: isotropic 4D and higher random directions not implemented");
 		{
 			Lock lock(*trace_mutex);
-			res.time=m_time_distribution->operator()(R);
-			res.lambda=m_lambda_distribution->operator()(R);
+			res.time=m_time_distribution->operator()();
+			res.lambda=m_lambda_distribution->operator()();
 		}
 		return res;
 	}
-	RectDimensions::IntersectionSearchResults Scintillator::TraceGeometry(Photon&ph,RANDOM&R)const{
-		uniform_real_distribution<double> prob_(0,1);
+	RectDimensions::IntersectionSearchResults Scintillator::TraceGeometry(Photon&ph)const{
+		RandomUniform<> prob_(0,1);
 		double absorption;{
 			Lock lock(*trace_mutex);
 			absorption=m_absorption(ph.lambda);
@@ -226,7 +226,7 @@ namespace RectangularScintillator{
 			//check for other effects
 			double absorption_prob=1.0-exp(-path_length*absorption);
 			{Lock lock(*trace_mutex);
-				if(prob_(R)<absorption_prob){
+				if(prob_()<absorption_prob){
 					//Photon is absopbed
 					res.surface=None;
 					return res;
@@ -239,7 +239,7 @@ namespace RectangularScintillator{
 				refl_prob*=Surface(dimension,res.surface).ReflectionProbabilityCoeff(point);
 			}
 			{Lock lock(*trace_mutex);
-				if(prob_(R)<refl_prob){
+				if(prob_()<refl_prob){
 					//Photon is reflected back
 					ph.dir[dimension]=-ph.dir[dimension];
 				}else{
@@ -259,7 +259,7 @@ namespace RectangularScintillator{
 			}
 		}
 	}
-	const std::shared_ptr<Distrib> TimeDistribution1(const double& sigma, const double& decay,const SortedChain<double>&&chain){
+	const std::shared_ptr<Distrib> TimeDistribution1(const double& sigma, const double& decay,const SortedChain<double>&chain){
 		if((sigma<=0)||(decay<=0))throw Exception<Distrib>("wrong distribution parameters");
 		double min=chain[0],max=chain[chain.size()-1],dt=(max-min)/double(chain.size());
 		auto func=[sigma,decay,max,min,dt](const double&t){
@@ -269,7 +269,7 @@ namespace RectangularScintillator{
 		};
 		return make_shared<DistribTable>(func,chain);
 	}
-	const std::shared_ptr<Distrib> TimeDistribution2(const double&rize,const double&sigma,const double&decay,const SortedChain<double>&&chain){
+	const std::shared_ptr<Distrib> TimeDistribution2(const double&rize,const double&sigma,const double&decay,const SortedChain<double>&chain){
 		if((sigma<=0)||(decay<=0))throw Exception<Distrib>("wrong distribution parameters");
 		double min=chain[0],max=chain[chain.size()-1],dt=(max-min)/double(chain.size());
 		auto func=[rize,sigma,decay,min,max,dt](const double&t){

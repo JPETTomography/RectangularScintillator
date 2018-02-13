@@ -10,7 +10,7 @@ namespace RectangularScintillator{
 		OrderStatisticsSigmaAnalyser(const size_t count);
 		virtual ~OrderStatisticsSigmaAnalyser();
 		const size_t count()const;
-		const MathTemplates::value<double>& At(size_t i)const;
+		const MathTemplates::StandardDeviation<double>& At(size_t i)const;
 		virtual void AcceptEventStart()override;
 		virtual void AcceptPhotonTime(const double&time)override;
 		virtual void AcceptEventEnd()override;

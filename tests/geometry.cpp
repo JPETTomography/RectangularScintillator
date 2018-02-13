@@ -6,15 +6,16 @@ using namespace std;
 using namespace MathTemplates;
 using namespace RectangularScintillator;
 TEST(VecOpr,throwtest){
+	RandomUniform<> Rand(-10,10);
 	Vec A;
 	Vec B;
 	for(int i=0;i<10;i++){
-		A.push_back(Rand(engine));
+		A.push_back(Rand());
 		EXPECT_THROW((A)+(B),Exception<Vec>);
 		EXPECT_THROW((A)-(B),Exception<Vec>);
 		EXPECT_THROW(SqDistance((A),(B)),Exception<Vec>);
 		EXPECT_THROW(Distance((A),(B)),Exception<Vec>);
-		B.push_back(Rand(engine));
+		B.push_back(Rand());
 		EXPECT_NO_THROW((A)+(B));
 		EXPECT_NO_THROW((A)-(B));
 		EXPECT_NO_THROW(SqDistance((A),(B)));
@@ -22,20 +23,21 @@ TEST(VecOpr,throwtest){
 	}
 	A.clear();B.clear();
 	for(int i=0;i<10;i++){
-		B.push_back(Rand(engine));
+		B.push_back(Rand());
 		EXPECT_THROW((A)+(B),Exception<Vec>);
 		EXPECT_THROW((A)-(B),Exception<Vec>);
-		A.push_back(Rand(engine));
+		A.push_back(Rand());
 		EXPECT_NO_THROW((A)+(B));
 		EXPECT_NO_THROW((A)-(B));
 	}
 }
 TEST(VecOpr,Mul){
+	RandomUniform<> Rand(-10,10);
 	Vec A;
 	for(int i=0;i<10;i++){
 		for(double c=-10;c<=10;c+=1)
 			EXPECT_TRUE(((A)*c).size()==A.size());
-		A.push_back(Rand(engine));
+		A.push_back(Rand());
 	}
 	A.clear();
 	for(int i=0;i<10;i++){
@@ -43,14 +45,15 @@ TEST(VecOpr,Mul){
 			Vec B=(A)*c;
 			Vec C=(B)*(1.0/c);
 			for(size_t i=0,n=A.size();i<n;i++){
-				EXPECT_TRUE(C[i]==A[i]);
+				EXPECT_CLOSE_VALUES(C[i],A[i]);
 				EXPECT_TRUE(B[i]==(A[i]*c));
 			}
 		}
-		A.push_back(iRand(engine));
+		A.push_back(Rand());///////
 	}
 }
 TEST(VecOpr,Add_Sub){
+	RandomUniform<> Rand(-10,10);
 	Vec A;
 	Vec B;
 	for(int i=0;i<10;i++){
@@ -58,8 +61,8 @@ TEST(VecOpr,Add_Sub){
 			EXPECT_TRUE(((A)+(B)).size()==A.size());
 			EXPECT_TRUE(((A)-(B)).size()==A.size());
 		}
-		A.push_back(Rand(engine));
-		B.push_back(Rand(engine));
+		A.push_back(Rand());
+		B.push_back(Rand());
 	}
 	A.clear();
 	B.clear();
@@ -72,11 +75,12 @@ TEST(VecOpr,Add_Sub){
 				EXPECT_TRUE(C[i]==(A[i]+B[i]));
 			}
 		}
-		A.push_back(Rand(engine));
-		B.push_back(Rand(engine));
+		A.push_back(Rand());
+		B.push_back(Rand());
 	}
 }
 TEST(VecOpr,Distances){
+	RandomUniform<> Rand(-10,10);
 	Vec A;
 	Vec B;
 	for(int i=0;i<10;i++){
@@ -85,17 +89,18 @@ TEST(VecOpr,Distances){
 			EXPECT_TRUE(d>=0);
 			EXPECT_TRUE(sqrt(SqDistance((A),(B)))==d);
 		}
-		A.push_back(Rand(engine));
-		B.push_back(Rand(engine));
+		A.push_back(Rand());
+		B.push_back(Rand());
 	}
 	A.clear();
 	B.clear();
-	A.push_back(Rand(engine));
-	B.push_back(Rand(engine));
+	A.push_back(Rand());
+	B.push_back(Rand());
 	EXPECT_TRUE(SqDistance((A),(B))==pow(A[0]-B[0],2));
 }
 
 TEST(RectDimensions,Dimensions){
+	RandomUniform<> Rand(-10,10);
 	RectDimensions A;
 	EXPECT_TRUE(A.NumberOfDimensions()==0);
 	EXPECT_THROW(A.Dimension(0),Exception<RectDimensions>);
@@ -114,6 +119,7 @@ TEST(RectDimensions,Dimensions){
 	}
 }
 TEST(RectDimensions,IsInside){
+	RandomUniform<> Rand(-10,10);
 	RectDimensions A;
 	for(size_t i=1;i<10;i++){
 		A<<make_pair(-10.0+i,double(i));
@@ -121,7 +127,7 @@ TEST(RectDimensions,IsInside){
 			bool test=true;
 			Vec v;
 			for(size_t j=0,n=A.NumberOfDimensions();j<n;j++){
-				double x=Rand(engine);
+				double x=Rand();
 				test&=(x>=A.Dimension(j).first)&&(x<=A.Dimension(j).second);
 				EXPECT_THROW(A.IsInside((v)),Exception<RectDimensions>);
 				v.push_back(x);
@@ -131,6 +137,7 @@ TEST(RectDimensions,IsInside){
 	}
 }
 TEST(RectDimensions,WhereIntersects_throwing1){
+	RandomUniform<> Rand(-10,10);
 	RectDimensions A;
 	Vec O;Vec D;
 	for(size_t i=1;i<10;i++){
@@ -143,6 +150,7 @@ TEST(RectDimensions,WhereIntersects_throwing1){
 	}
 }
 TEST(RectDimensions,WhereIntersects_throwing2){
+	RandomUniform<> Rand(-10,10);
 	RectDimensions A;
 	Vec O;Vec D;
 	for(size_t i=1;i<10;i++){
@@ -155,15 +163,16 @@ TEST(RectDimensions,WhereIntersects_throwing2){
 	}
 }
 TEST(RectDimensions,WhereIntersects){
+	RandomUniform<> Rand(-10,10);
 	for(size_t cnt=0;cnt<20000;cnt++){
 		RectDimensions A;
 		Vec O, Outside,D;
 		for(size_t i=1;i<10;i++){
 			A<<make_pair(-10.0+i,double(i));
-			uniform_real_distribution<double> coord(-10.0+i,i);
-			O.push_back(coord(engine));
+			RandomUniform<double> coord(-10.0+i,i);
+			O.push_back(coord());
 			Outside.push_back(100);
-			D.push_back(Rand(engine));
+			D.push_back(Rand());
 			EXPECT_TRUE(A.WhereIntersects((Outside),(D)).surface==RectDimensions::None);
 			if(Abs((D))>0){
 				RectDimensions::IntersectionSearchResults res=A.WhereIntersects((O),(D));

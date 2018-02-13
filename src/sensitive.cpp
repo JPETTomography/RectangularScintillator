@@ -24,12 +24,12 @@ namespace RectangularScintillator{
 			sig->AcceptEventStart();
 		times.clear();
 	}
-	void PhotoSensitiveSurface::AbsorbPhoton(Photon& photon,RANDOM&R){
+	void PhotoSensitiveSurface::AbsorbPhoton(Photon& photon){
 		if(IsInside(photon.coord))
-			if(P(R)<m_efficiency(photon.lambda))
-				PhotonTimeAccepted(photon.time,R);
+			if(P()<m_efficiency(photon.lambda))
+				PhotonTimeAccepted(photon.time);
 	}
-	void PhotoSensitiveSurface::PhotonTimeAccepted(const double&time,RANDOM&){
+	void PhotoSensitiveSurface::PhotonTimeAccepted(const double&time){
 		details::InsertSorted(time,times,field_size(times),field_insert(times,double));
 	}
 	void PhotoSensitiveSurface::End(){
@@ -44,8 +44,8 @@ namespace RectangularScintillator{
 	    const vector<Pair>&dimensions,const double&glue,const Func efficiency,const double&tts
 	):PhotoSensitiveSurface(dimensions,glue,efficiency),m_tts(5*tts,tts){}
 	PhotoSensitiveSurfaceWithTTS::~PhotoSensitiveSurfaceWithTTS(){}
-	void PhotoSensitiveSurfaceWithTTS::PhotonTimeAccepted(const double&time, RANDOM& R){
-		double offs=m_tts(R);if(offs<0)offs=0;
-		PhotoSensitiveSurface::PhotonTimeAccepted(time+offs, R);
+	void PhotoSensitiveSurfaceWithTTS::PhotonTimeAccepted(const double&time){
+		double offs=m_tts();if(offs<0)offs=0;
+		PhotoSensitiveSurface::PhotonTimeAccepted(time+offs);
 	}
 };

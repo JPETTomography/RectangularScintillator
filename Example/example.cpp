@@ -20,9 +20,8 @@ int main(int , char **){
 		(make_shared<SignalSumm>()<<left<<right)>>time_difference;
 	}
 	cout<<"Simulation..."<<endl;
-	RANDOM engine;
 	for(unsigned int cnt=0;cnt<500;cnt++)
-		scintillator->RegisterGamma({0,0,0},3000,engine);
+		scintillator->RegisterGamma({0,0,0},3000);
 	cout<<"done."<<endl;
 	cout<<"Time difference = "
 	      <<time_difference->data().val()<<" +/- "

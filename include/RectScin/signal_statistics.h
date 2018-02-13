@@ -16,7 +16,7 @@ namespace RectangularScintillator{
 		virtual void AcceptEventStart()override;
 		virtual void AcceptSignalValue(const double&time)override;
 		virtual void AcceptEventEnd()override;
-		const MathTemplates::value<double>&data()const;
+		const MathTemplates::StandardDeviation<double>&data()const;
 	private:
 		MathTemplates::StandardDeviation<double> m_data;
 	};

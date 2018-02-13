@@ -6,23 +6,29 @@ using namespace std;
 using namespace MathTemplates;
 using namespace RectangularScintillator;
 TEST(SignalPolinomialDistort,Base){
+	RandomUniform<> Rand(-10,10);
 	for(size_t p=0;p<10;p++){
-		Vec C;for(size_t i=0;i<=p;i++)C.push_back(Rand(engine));
+		Vec C;for(size_t i=0;i<=p;i++)C.push_back(Rand());
 		auto test=PolynomDistort(static_cast<decltype(C)>(C));
 		SignalSender sender;auto out=make_shared<Out>();
 		sender>>(test>>out);
-		double signal=Rand(engine);
+		double signal=Rand();
 		sender.send({signal});
-		double expected=Polynom(signal,C,p);
+		double expected=0,pp=1;
+		for(double c:C){
+		    expected+=pp*c;
+		    pp*=signal;
+		}
 		EXPECT_CLOSE_VALUES(out->value(),expected);
 	}
 }
 TEST(SignalSumm,Base){
+	RandomUniform<> Rand(-10,10);
 	for(size_t n=1;n<=10;n++){
 		Vec signals;
 		double expected=0;
 		for(size_t i=0;i<n;i++){
-			double s=Rand(engine);
+			double s=Rand();
 			signals.push_back(s);
 			expected+=s;
 		}
@@ -35,11 +41,12 @@ TEST(SignalSumm,Base){
 	}
 }
 TEST(SignalProduct,Base){
+	RandomUniform<> Rand(-10,10);
 	for(size_t n=1;n<=10;n++){
 		Vec signals;
 		double expected=1;
 		for(size_t i=0;i<n;i++){
-			double s=Rand(engine);
+			double s=Rand();
 			signals.push_back(s);
 			expected*=s;
 		}
@@ -71,14 +78,14 @@ TEST(SignalSortAndSelect,BaseTest){
 			auto test=make_shared<SignalSortAndSelect>(orderstatistics);
 			SignalSender sender;auto out=make_shared<Out>();
 			test>>out; sender.Connect2MultiInput(test,n);
-			uniform_int_distribution<int> indexr(0,100000);
+			RandomUniform<> indexr(0,100000);
 			for(size_t k=0;k<50;k++){
 				Vec signals;
 				for(double v=0;v<n;v++)
 					if(signals.size()==0)
 						signals.push_back(v);
 					else
-						signals.insert(signals.begin()+indexr(engine)%(signals.size()+1),v);
+						signals.insert(signals.begin()+size_t(indexr())%(signals.size()+1),v);
 				if(orderstatistics<n)
 					EXPECT_NO_THROW(sender.send(static_cast<Vec&&>(signals)));
 				else
@@ -98,12 +105,12 @@ TEST(SignalSortAndSelect2,BaseTest){
 			test>>out1>>out2; sender.Connect2MultiInput(test,n);
 			for(size_t k=0;k<100;k++){
 				Vec signals;
-				uniform_int_distribution<int> indexr(0,100000);
+				RandomUniform<> indexr(0,100000);
 				for(double v=0;v<n;v++)
 					if(signals.size()==0)
 						signals.push_back(v);
 					else
-						signals.insert(signals.begin()+indexr(engine)%(signals.size()+1),v);
+						signals.insert(signals.begin()+size_t(indexr())%(signals.size()+1),v);
 				if(orderstatistics<n)
 					EXPECT_NO_THROW(sender.send(static_cast<Vec&&>(signals)));
 				else
@@ -125,6 +132,7 @@ TEST(SignalSortAndSelect2,BaseTest){
 		}
 }
 TEST(TimeGate,SimpleTest){
+	RandomUniform<> Rand(-10,10);
 	EXPECT_THROW(make_shared<TimeGate>(-1),Exception<TimeGate>);
 	EXPECT_THROW(make_shared<TimeGate>(0),Exception<TimeGate>);
 	for(double d=1;d<10;d+=1){
@@ -151,6 +159,7 @@ TEST(TimeGate,SimpleTest){
 	
 }
 TEST(AllSignalsPresent,SimpleTest){
+	RandomUniform<> Rand(-10,10);
 	auto test=make_shared<AllSignalsPresent>();
 	auto out1=make_shared<Out>(),out2=make_shared<Out>();
 	SignalSender sender;
@@ -176,6 +185,7 @@ TEST(AllSignalsPresent,SimpleTest){
 	}
 }
 TEST(SignalSort,Base){
+	RandomUniform<> Rand(-10,10);
 	for(size_t n=1;n<=20;n++)for(size_t outcnt=1;outcnt<=20;outcnt++){
 			auto test=make_shared<SignalSort>();
 			SignalSender sender;sender.Connect2MultiInput(test,n);
@@ -185,13 +195,13 @@ TEST(SignalSort,Base){
 				test>>o;
 				out.push_back(o);
 			}
-			uniform_int_distribution<int> indexr(0,100);
+			RandomUniform<> indexr(0,100);
 			for(size_t k=0;k<50;k++){
 				Vec signals;double c=3;
 				for(double v=0;v<n;v++){
 					double V=v*c;
 					if(signals.size()==0)signals.push_back(V);
-					else signals.insert(signals.begin()+indexr(engine)%(signals.size()+1),V);
+					else signals.insert(signals.begin()+size_t(indexr())%(signals.size()+1),V);
 				}
 				sender.send(static_cast<Vec&&>(signals));
 				size_t f=outcnt;if(f>n){f=n;}
@@ -203,6 +213,7 @@ TEST(SignalSort,Base){
 	}
 }
 TEST(SignalSort2,Base){
+	RandomUniform<> Rand(-10,10);
 	const size_t N=5;
 	for(size_t n=1;n<=N;n++)for(size_t outcnt=1;outcnt<=N;outcnt++){
 		auto test=make_shared<SignalSort2>();
@@ -214,13 +225,13 @@ TEST(SignalSort2,Base){
 			out.push_back(o);
 		}
 		size_t f=outcnt;if(f>n){f=n;}
-		uniform_int_distribution<int> indexr(0,1000);
+		RandomUniform<> indexr(0,1000);
 		for(size_t k=0;k<50;k++){
 			Vec signals;double c=3;
 			for(double v=0;v<n;v++){
 				double V=v*c;
 				if(signals.size()==0)signals.push_back(V);
-				else signals.insert(signals.begin()+indexr(engine)%(signals.size()+1),V);
+				else signals.insert(signals.begin()+size_t(indexr())%(signals.size()+1),V);
 			}
 			sender.send(static_cast<Vec&&>(signals));
 			for(size_t i=0;i<f;i++){

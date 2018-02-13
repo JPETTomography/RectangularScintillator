@@ -11,7 +11,6 @@
 namespace RectangularScintillator{
 	const double speed_of_light=300;//mm/ns
 	typedef std::function<const double(const double&)> Func;
-	typedef MathTemplates::RANDOM RANDOM;
 	typedef MathTemplates::RandomValueGenerator<> Distrib;
 	typedef MathTemplates::RandomValueTableDistr<> DistribTable;
 	typedef MathTemplates::RandomGauss<> DistribGauss;
@@ -36,7 +35,7 @@ namespace RectangularScintillator{
 	public:
 		virtual ~IPhotonAbsorber(){}
 		virtual void Start()=0;
-		virtual void AbsorbPhoton(Photon&photon,RANDOM&R)=0;
+		virtual void AbsorbPhoton(Photon&photon)=0;
 		virtual void End()=0;
 		virtual const RectDimensions&Dimensions()const=0;
 		virtual double GlueEfficiency()const=0;
@@ -51,7 +50,7 @@ namespace RectangularScintillator{
 		const RectDimensions&Dimensions()const;
 	protected:
 		void Start();
-		void RegisterPhoton(Photon&photon,RANDOM&R);//changes photon
+		void RegisterPhoton(Photon&photon);//changes photon
 		void End();
 		const double ReflectionProbabilityCoeff(const Vec&point)const;
 	private:
@@ -70,7 +69,7 @@ namespace RectangularScintillator{
 		);
 		virtual ~Scintillator();
 		ScintillatorSurface&Surface(const size_t dimension,const Side side)const;
-		void RegisterGamma(const Vec&&coord,const size_t N,RANDOM&R)const;
+		void RegisterGamma(const Vec&&coord,const size_t N)const;
 		
 		struct Options{
 			size_t concurrency;
@@ -87,8 +86,8 @@ namespace RectangularScintillator{
 		
 		const MathTemplates::LinearInterpolation<double>&ReflectionProbabilityFunction()const;
 	protected:
-		Photon GeneratePhoton(const Vec&coord,RANDOM&R)const;
-		IntersectionSearchResults TraceGeometry(Photon &ph,RANDOM&R)const;
+		Photon GeneratePhoton(const Vec&coord)const;
+		IntersectionSearchResults TraceGeometry(Photon &ph)const;
 	private:
 		Options m_config;
 		std::shared_ptr<Distrib>m_time_distribution;
@@ -122,8 +121,8 @@ namespace RectangularScintillator{
 	}
 
 	const std::shared_ptr<Distrib> TimeDistribution1(const double&sigma, const double& decay,
-	    const MathTemplates::SortedChain<double>&&time_chain=MathTemplates::ChainWithStep(0.0,0.1,20.0));
+	    const MathTemplates::SortedChain<double>&time_chain=MathTemplates::ChainWithStep(0.0,0.1,20.0));
 	const std::shared_ptr<Distrib> TimeDistribution2(const double& rize, const double& sigma,const double&decay,
-	    const MathTemplates::SortedChain<double>&&time_chain=MathTemplates::ChainWithStep(0.0,0.1,20.0));
+	    const MathTemplates::SortedChain<double>&time_chain=MathTemplates::ChainWithStep(0.0,0.1,20.0));
 };
 #endif

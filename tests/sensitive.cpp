@@ -24,6 +24,7 @@ TEST(PhotoSensitiveSurface,Glue_eff){
 	}
 }
 TEST(PhotoSensitiveSurface,Efficiency){
+	RandomUniform<> Rand(-10,10);
 	for(double eff=0;eff<=1;eff+=1){
 		auto Phm=Photosensor({make_pair(-1,1),make_pair(-1,1)},1,[eff](double){return eff;});
 		auto check=make_shared<PhotonCheck>();
@@ -36,17 +37,18 @@ TEST(PhotoSensitiveSurface,Efficiency){
 				ph.coord={0,0};
 				ph.dir={0,0};
 				ph.lambda=1;
-				ph.time=Rand(engine);
-				Phm->AbsorbPhoton(ph,engine);
+				ph.time=Rand();
+				Phm->AbsorbPhoton(ph);
 			}
 			Phm->End();
 			stat<<(check->data().size());
 		}
-		if((eff==0)||(eff==1)){EXPECT_EQ(eff*1000,stat().val());}
-		EXPECT_TRUE(stat().Contains(eff*1000));
+		if((eff==0)||(eff==1)){EXPECT_EQ(eff*1000,stat.val());}
+		EXPECT_TRUE(stat.Contains(eff*1000));
 	}
 }
 TEST(PhotoSensitiveSurface,Geometry){
+	RandomUniform<> Rand(-10,10);
 	auto Phm=Photosensor({make_pair(-1,1),make_pair(-1,1)},1,[](double){return 1;});
 	auto check=make_shared<PhotonCheck>();
 	Phm>>check;
@@ -58,8 +60,8 @@ TEST(PhotoSensitiveSurface,Geometry){
 				ph.coord={2,2};
 				ph.dir={0,0};
 				ph.lambda=1;
-				ph.time=Rand(engine);
-				Phm->AbsorbPhoton(ph,engine);
+				ph.time=Rand();
+				Phm->AbsorbPhoton(ph);
 			}
 			Phm->End();
 			EXPECT_EQ(0,check->data().size());
@@ -70,13 +72,14 @@ TEST(PhotoSensitiveSurface,Geometry){
 				ph.dir={0,0};
 				ph.lambda=1;
 				ph.time=double(rand()%1000)/100;
-				Phm->AbsorbPhoton(ph,engine);
+				Phm->AbsorbPhoton(ph);
 			}
 			Phm->End();
 			EXPECT_EQ(n,check->data().size());
 		}
 }
 TEST(PhotoSensitiveSurface,PhotonSortingTest){
+	RandomUniform<> Rand(-10,10);
 	auto Phm=Photosensor({make_pair(-1,1),make_pair(-1,1)},1,[](double){return 1;});
 	auto check=make_shared<PhotonCheck>();
 	Phm>>check;
@@ -88,8 +91,8 @@ TEST(PhotoSensitiveSurface,PhotonSortingTest){
 				ph.coord={0,0};
 				ph.dir={0,0};
 				ph.lambda=1;
-				ph.time=Rand(engine);
-				Phm->AbsorbPhoton(ph,engine);
+				ph.time=Rand();
+				Phm->AbsorbPhoton(ph);
 			}
 			Phm->End();
 			for(size_t i=1;i<n;i++)
@@ -97,6 +100,7 @@ TEST(PhotoSensitiveSurface,PhotonSortingTest){
 		}
 }
 TEST(PhotoSensitiveSurfaceWithTTS,tts){
+	RandomUniform<> Rand(-10,10);
 	for(double tts=0;tts<0.6;tts+=0.1){
 		auto Phm=Photosensor({make_pair(-1,1),make_pair(-1,1)},1,[](double){return 1;},tts);
 		auto check=make_shared<PhotonCheck>();
@@ -109,10 +113,10 @@ TEST(PhotoSensitiveSurfaceWithTTS,tts){
 			ph.dir={0,0};
 			ph.lambda=1;
 			ph.time=1;
-			Phm->AbsorbPhoton(ph,engine);
+			Phm->AbsorbPhoton(ph);
 			Phm->End();
 			sig<<(check->data()[0]);
 		}
-		EXPECT_TRUE(value<double>(tts,0.2*tts).Contains(sig().uncertainty()));
+		EXPECT_TRUE(value<double>(tts,0.2*tts).Contains(sig.uncertainty()));
 	}
 }

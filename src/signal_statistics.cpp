@@ -10,7 +10,7 @@ namespace RectangularScintillator{
 	void SignalStatictics::AcceptEventStart(){}
 	void SignalStatictics::AcceptSignalValue(const double&time){m_data<<time;}
 	void SignalStatictics::AcceptEventEnd(){}
-	const value<double>&SignalStatictics::data()const{return m_data();}
+	const StandardDeviation<double>&SignalStatictics::data()const{return m_data;}
 	
 	SignalsToFile::SignalsToFile(){}
 	SignalsToFile::~SignalsToFile(){

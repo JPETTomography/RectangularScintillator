@@ -7,25 +7,18 @@ Compiling
 
 If you have your git repository with cmake project you can add needed repositories as submodules:
 
-    git submodule add https://github.com/alexkernphysiker/math_h.git
-    git submodule add https://github.com/alexkernphysiker/RectangularScintillator.git
-    git submodule update --init --recursive
+	git submodule add https://github.com/alexkernphysiker/math_h.git
+	git submodule add https://github.com/alexkernphysiker/RectangularScintillator.git
+	git submodule update --init --recursive
 
 Then add to CMakeLists.txt the following lines
 
-    add_subdirectory(math_h)
-    include_directories(${MATH_H_INC})
-    add_subdirectory(RectangularScintillator)
-    include_directories(${RECTSCIN_INC})
-
-
-CMake Options
-=============
-
-    test
-if ON the tests are compiled
-
-
+	add_definitions(--std=c++17) #the most recommended compiler mode
+	set(GTEST ON) #for compiling unit-tests. Requires gtest
+	add_subdirectory(math_h)
+	add_subdirectory(RectangularScintillator)
+	include_directories(${MATH_H_INC})
+	include_directories(${RECTSCIN_INC})
 
 
 General information

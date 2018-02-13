@@ -22,13 +22,13 @@ namespace RectangularScintillator{
 	void FlatLightguide::Start(){
 		ScintillatorSurface::Start();
 	}
-	void FlatLightguide::AbsorbPhoton(Photon& photon,RANDOM&R){
+	void FlatLightguide::AbsorbPhoton(Photon& photon){
 		photon.dir=photon.dir*(1.0/refr);
 		double horiz=Abs(photon.dir);
 		double vert=sqrt(1.0-horiz*horiz);
 		Vec offset=photon.dir*(horiz*height/vert);
 		photon.coord=photon.coord+offset;
-		ScintillatorSurface::RegisterPhoton(photon,R);
+		ScintillatorSurface::RegisterPhoton(photon);
 	}
 	void FlatLightguide::End(){
 		ScintillatorSurface::End();

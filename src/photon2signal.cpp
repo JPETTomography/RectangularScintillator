@@ -14,10 +14,10 @@ namespace RectangularScintillator{
 	const size_t OrderStatisticsSigmaAnalyser::count()const{
 		return m_stat.size();
 	}
-	const value<double>& OrderStatisticsSigmaAnalyser::At(size_t i)const{
+	const StandardDeviation<double>& OrderStatisticsSigmaAnalyser::At(size_t i)const{
 		if(i>=count())
 			throw Exception<OrderStatisticsSigmaAnalyser>("Order statistics range check error");
-		return m_stat[i]();
+		return m_stat[i];
 	}
 	void OrderStatisticsSigmaAnalyser::AcceptEventStart(){
 		m_count=0;

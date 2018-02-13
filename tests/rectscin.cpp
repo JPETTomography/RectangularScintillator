@@ -12,8 +12,8 @@ TEST(Scintillator,reflection){
 }
 TEST(Scintillator,geometry){
 	auto rsc=MakeScintillator({make_pair(0,1),make_pair(0,1),make_pair(0,1)},1.0,TimeDistribution1(0.5,1.5));
-	EXPECT_NO_THROW(rsc->RegisterGamma({0.5,0.5,0.5},10,engine));
-	EXPECT_THROW(rsc->RegisterGamma({2,2,2},1,engine),Exception<Scintillator>);
+	EXPECT_NO_THROW(rsc->RegisterGamma({0.5,0.5,0.5},10));
+	EXPECT_THROW(rsc->RegisterGamma({2,2,2},1),Exception<Scintillator>);
 }
 TEST(Scintillator, Isotropic){
 	auto rsc=MakeScintillator({make_pair(0,1),make_pair(0,1),make_pair(0,1)},1.6,TimeDistribution1(0.5,1.5));
@@ -30,7 +30,7 @@ TEST(Scintillator, Isotropic){
 			times.push_back(time);
 		}
 	for(size_t cnt=0;cnt<300;cnt++)
-		rsc->RegisterGamma({0.5,0.5,0.5},3000,engine);
+		rsc->RegisterGamma({0.5,0.5,0.5},3000);
 	auto check_close=[](vector<shared_ptr<SignalStatictics>>&vec){
 		value<double> for_cmp=vec[0]->data();
 		for(shared_ptr<SignalStatictics>one:vec)
@@ -57,7 +57,7 @@ TEST(Scintillator,Glue){
 		>>(make_shared<AmplitudeSignal>()>>worst)
 	);
 	for(size_t cnt=0;cnt<200;cnt++)
-		rsc->RegisterGamma({0,0,0},3000,engine);
+		rsc->RegisterGamma({0,0,0},3000);
 	EXPECT_TRUE(worst->data().val()<ideal->data().val());
 	EXPECT_TRUE(worst->data().val()<middle->data().val());
 	EXPECT_TRUE(middle->data().val()<ideal->data().val());
@@ -95,11 +95,11 @@ TEST(Scintillator, oneD_symmetry_plus_concurrency){
 	for(size_t threads=1;threads<5;threads++){
 		for(size_t index=0;index<2;index++)rsc[index]->Configure(Scintillator::Options(threads,5));
 		cout<< threads<<" threads"<<endl;
-		for(size_t cnt=0;cnt<200;cnt++)
-			rsc[0]->RegisterGamma({-30,0,0},3000,engine);
-		for(size_t cnt=0;cnt<200;cnt++)
-			rsc[1]->RegisterGamma({+30,0,0},3000,engine);
-		EXPECT_TRUE(amplstat[0]->data().Contains(amplstat[1]->data()));
+		for(size_t cnt=0;cnt<1000;cnt++)
+			rsc[0]->RegisterGamma({-30,0,0},3000);
+		for(size_t cnt=0;cnt<1000;cnt++)
+			rsc[1]->RegisterGamma({+30,0,0},3000);
+		EXPECT_TRUE(value<>(amplstat[0]->data()).make_wider(2).Contains(amplstat[1]->data()));
 		EXPECT_TRUE(timestat[0]->data().Contains(timestat[1]->data()));
 	}
 }

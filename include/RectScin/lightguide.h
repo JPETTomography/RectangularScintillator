@@ -10,7 +10,7 @@ namespace RectangularScintillator{
 		virtual ~FlatLightguide();
 		FlatLightguide&operator>>(const std::shared_ptr<IPhotonAbsorber>sensor);
 		virtual void Start()override;
-		virtual void AbsorbPhoton(Photon& photon,RANDOM&R)override;
+		virtual void AbsorbPhoton(Photon& photon)override;
 		virtual void End()override;
 		virtual double GlueEfficiency()const override;
 		virtual const RectDimensions&Dimensions()const override;

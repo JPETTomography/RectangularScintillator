@@ -20,7 +20,16 @@ namespace RectangularScintillator{
 	}
 	SignalPolinomialDistort::~SignalPolinomialDistort(){}
 	void SignalPolinomialDistort::AcceptSignalValue(const double&signal){
-		SendSignalValue(Polynom(signal,m_coefs,m_coefs.size()-1));
+	    if(m_coefs.size()==0){
+		SendSignalValue(0);
+	    }else{
+		double res=m_coefs[0],p=1;
+		for(size_t i=1;i<m_coefs.size();i++){
+		    p*=signal;
+		    res+=p*m_coefs[i];
+		}
+		SendSignalValue(res);
+	    }
 	}
 	
 	AmplitudeDiscriminator::AmplitudeDiscriminator(const double& thr){
