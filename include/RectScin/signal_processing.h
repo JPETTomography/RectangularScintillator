@@ -124,7 +124,7 @@ namespace RectangularScintillator{
 		Single2MultiSignal();
 		virtual ~Single2MultiSignal();
 		virtual void AcceptEventStart()override;
-		virtual void AcceptSignalValue(const double&time)=0;
+		//virtual void AcceptSignalValue(const double&time)=0;
 		virtual void AcceptEventEnd()override;
 	};
 	class Multi2MultiSignal:public AbstractMultiInput,public AbstractMultiOutput{

@@ -97,7 +97,7 @@ namespace RectangularScintillator{
 		MathTemplates::LinearInterpolation<double> reflection_probability;
 		typedef std::pair<std::shared_ptr<ScintillatorSurface>,std::shared_ptr<ScintillatorSurface>> SurfPair;
 		std::vector<SurfPair> m_edges;
-		std::shared_ptr<std::mutex> trace_mutex;
+		std::mutex trace_mutex;
 	};
 	inline const std::shared_ptr<Scintillator> MakeScintillator(
 		const std::vector<Pair>&dimensions,

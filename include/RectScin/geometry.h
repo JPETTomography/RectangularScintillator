@@ -35,7 +35,7 @@ namespace RectangularScintillator{
 		const IntersectionSearchResults WhereIntersects(const Vec&point,const Vec&dir)const;
 	private:
 		std::vector<Pair> m_dimensions;
-		std::shared_ptr<std::mutex> geom_mutex;
+		std::mutex geom_mutex;
 	};
 	RectDimensions::Side&inc(RectDimensions::Side&val);
 };

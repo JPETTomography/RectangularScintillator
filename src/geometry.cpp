@@ -43,12 +43,12 @@ namespace RectangularScintillator{
 		val=static_cast<RectDimensions::Side>(val+1);
 		return val;
 	}
-	RectDimensions::RectDimensions(){geom_mutex=make_shared<mutex>();}
+	RectDimensions::RectDimensions(){}
 	RectDimensions::~RectDimensions(){}
 	RectDimensions& RectDimensions::operator<<(const Pair&dimension){
 		if(dimension.first>dimension.second)
 			throw Exception<RectDimensions>("RectDimensions: wrong dimension left>right");
-		Lock lock(*geom_mutex);
+		Lock lock(geom_mutex);
 		m_dimensions.push_back(dimension);
 		return *this;
 	}
@@ -79,14 +79,14 @@ namespace RectangularScintillator{
 		vector<dist_dim> dim_order;
 		for(size_t i=0,n=NumberOfDimensions();i<n;i++){
 			dist_dim newdim;
-			Lock lock(*geom_mutex);
+			Lock lock(const_cast<mutex&>(geom_mutex));
 			newdim.second=i;
 			if(dir[i]<0)
 				newdim.first=point[i]-m_dimensions[i].first;
 			if(dir[i]>0)
 				newdim.first=m_dimensions[i].second-point[i];
 			if(dir[i]!=0)
-				details::InsertSorted(newdim,dim_order,std_size(dim_order),std_insert(dim_order,dist_dim));
+				table_data_details::InsertSorted(newdim,dim_order,std_size(dim_order),std_insert(dim_order,dist_dim));
 		}
 		if(dim_order.size()==0){
 			IntersectionSearchResults res;

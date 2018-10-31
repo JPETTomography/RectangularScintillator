@@ -71,7 +71,6 @@ namespace RectangularScintillator{
 		m_time_distribution(time_distribution),
 		m_lambda_distribution(lambda_distribution)
 	{
-		trace_mutex=make_shared<mutex>();
 		if(dimensions.size()==0)
 			throw Exception<Scintillator>("Cannot create scintillator with no dimensions");
 		for(const Pair&D:dimensions)RectDimensions::operator<<(D);
@@ -115,7 +114,7 @@ namespace RectangularScintillator{
 	ScintillatorSurface& Scintillator::Surface(size_t dimension, Side side)const{
 		if(dimension>=NumberOfDimensions())
 			throw Exception<Scintillator>("Scintillator: dimension index out of range");
-		Lock lock(*trace_mutex);
+		Lock lock(const_cast<mutex&>(trace_mutex));
 		if(side==Left)return *(m_edges[dimension].first);
 		if(side==Right)return *(m_edges[dimension].second);
 		throw Exception<Scintillator>("Scintillator: surface index out of range");
@@ -174,7 +173,7 @@ namespace RectangularScintillator{
 			RandomUniform<> get_angle(0,2.0*3.1415926);
 			RandomUniform<> get_secondangle(-1,1);
 			double cos_theta,phi;
-			{Lock lock(*trace_mutex);
+			{Lock lock(const_cast<mutex&>(trace_mutex));
 				phi=get_angle();
 				cos_theta=get_secondangle();
 			}
@@ -186,7 +185,7 @@ namespace RectangularScintillator{
 		if(NumberOfDimensions()>=4)
 			throw Exception<Scintillator>("Scintillator: isotropic 4D and higher random directions not implemented");
 		{
-			Lock lock(*trace_mutex);
+			Lock lock(const_cast<mutex&>(trace_mutex));
 			res.time=m_time_distribution->operator()();
 			res.lambda=m_lambda_distribution->operator()();
 		}
@@ -195,7 +194,7 @@ namespace RectangularScintillator{
 	RectDimensions::IntersectionSearchResults Scintillator::TraceGeometry(Photon&ph)const{
 		RandomUniform<> prob_(0,1);
 		double absorption;{
-			Lock lock(*trace_mutex);
+			Lock lock(const_cast<mutex&>(trace_mutex));
 			absorption=m_absorption(ph.lambda);
 		}
 		double refl_p[NumberOfDimensions()];
@@ -205,7 +204,7 @@ namespace RectangularScintillator{
 				cos_angle=-cos_angle;
 			if(cos_angle>1.0)
 				throw Exception<Scintillator>("Trace: cosine error");
-			Lock lock(*trace_mutex);
+			Lock lock(const_cast<mutex&>(trace_mutex));
 			refl_p[dimension]=reflection_probability(cos_angle);
 		}
 		unsigned long refl_counter=0;
@@ -225,7 +224,7 @@ namespace RectangularScintillator{
 				ph.coord[dimension]=Dimension(dimension).second;
 			//check for other effects
 			double absorption_prob=1.0-exp(-path_length*absorption);
-			{Lock lock(*trace_mutex);
+			{Lock lock(const_cast<mutex&>(trace_mutex));
 				if(prob_()<absorption_prob){
 					//Photon is absopbed
 					res.surface=None;
@@ -238,7 +237,7 @@ namespace RectangularScintillator{
 				point.erase(point.begin()+dimension);
 				refl_prob*=Surface(dimension,res.surface).ReflectionProbabilityCoeff(point);
 			}
-			{Lock lock(*trace_mutex);
+			{Lock lock(const_cast<mutex&>(trace_mutex));
 				if(prob_()<refl_prob){
 					//Photon is reflected back
 					ph.dir[dimension]=-ph.dir[dimension];

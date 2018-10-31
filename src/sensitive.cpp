@@ -30,7 +30,7 @@ namespace RectangularScintillator{
 				PhotonTimeAccepted(photon.time);
 	}
 	void PhotoSensitiveSurface::PhotonTimeAccepted(const double&time){
-		details::InsertSorted(time,times,field_size(times),field_insert(times,double));
+		table_data_details::InsertSorted(time,times,field_size(times),field_insert(times,double));
 	}
 	void PhotoSensitiveSurface::End(){
 		for(double time:times)
