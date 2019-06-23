@@ -10,7 +10,8 @@ using namespace std;
 using namespace MathTemplates;
 using namespace RectangularScintillator;
 int main(int , char **){
-	auto scintillator=MakeScintillator({make_pair(-15,15),make_pair(-7,7),make_pair(-7,7)},1.58,TimeDistribution2(0.005,0.2,1.5));
+	auto scintillator=MakeScintillator_absorptionless({make_pair(-15,15),make_pair(-7,7),make_pair(-7,7)},1.58,TimeDistribution2(0.005,0.2,1.5));
+	scintillator->Configure(Scintillator::Options(1,50));
 	auto time_difference=make_shared<SignalStatictics>();
 	{
 		auto photosensor=[](){return Photosensor({make_pair(-7,7),make_pair(-7,7)},1,[](double){return 0.3;});};

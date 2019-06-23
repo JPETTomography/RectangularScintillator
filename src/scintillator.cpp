@@ -100,8 +100,8 @@ namespace RectangularScintillator{
 		concurrency=source.concurrency;
 		max_reflections=source.max_reflections;
 	}
-	Scintillator::Options Scintillator::Defaults(){return Options(1,0);}
-	Scintillator::Options Scintillator::Concurrency(const size_t c){return Options(c,0);}
+	Scintillator::Options Scintillator::Defaults(){return Options(1,50);}
+	Scintillator::Options Scintillator::Concurrency(const size_t c){return Options(c,50);}
 	Scintillator::Options Scintillator::Reflections(const long unsigned int r){return Options(1,r);}
 	
 	

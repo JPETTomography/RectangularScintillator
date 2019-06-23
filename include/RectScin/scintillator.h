@@ -110,7 +110,7 @@ namespace RectangularScintillator{
 			new Scintillator(dimensions,refraction,time_distribution,lambda_distribution,absorption)
 		);
 	}
-	inline const std::shared_ptr<Scintillator> MakeScintillator(
+	inline const std::shared_ptr<Scintillator> MakeScintillator_absorptionless(
 		const std::vector<Pair>&dimensions,
 		const double refraction,
 		const std::shared_ptr<Distrib> time_distribution
